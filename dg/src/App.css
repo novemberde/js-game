@@ -1,14 +1,19 @@
 .App {
   text-align: center;
   height: 100%;
+  margin: auto;
+  width: 600px !important;
 }
 
 .App-header {
   background-color: #222;
-  height: 36px;
+  height: 32px;
   color: white;
 }
 
-.App-intro {
-  font-size: large;
+@media screen and (max-width: 600px) {
+  .App {
+    width: 100%;
+  }
+  
 }
