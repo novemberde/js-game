@@ -3,6 +3,7 @@ import './PlayGround.css'
 
 const defaultProps = {
   hero: null,
+  bullets: null,
   onCreate: () => console.warn("onCreate should be defined.")
 };
 
@@ -16,6 +17,7 @@ class PlayGround extends Component {
     return (
       <div className="PlayGround" ref={div => this.div=div}>
         {this.props.hero}
+        {this.props.bullets}
       </div>
     )
   }

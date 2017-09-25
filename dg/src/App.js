@@ -6,6 +6,7 @@ import PlayGround from './components/PlayGround'
 import Hero from './components/Hero'
 import JoyStick from './components/JoyStick'
 import hitTest from './lib/hitTest'
+import Bullet from './components/Bullet'
 
 class App extends Component {
   constructor (props, context) {
@@ -21,7 +22,14 @@ class App extends Component {
       playGround: {
         height: 0,
         width: 0
-      }
+      },
+      bullets: [
+        // {
+        //   key: 123
+        //   top: 0,
+        //   left: 0
+        // }
+      ]
     };
 
     this.stepX = 0;
@@ -30,10 +38,15 @@ class App extends Component {
     this.step = 2;
     this.gravity = 0.04;
     this.jumpForce = -8;
+    this.bulletVelX = 5;
+    this.isOnShot = false;
+    this.shotCount = 0;
+    this.shotInterval = 20;
 
     this.hero = null;
 
     this.setHero = this.setHero.bind(this);
+    this.intervalFunction = this.intervalFunction.bind(this);
     this.handleHeroLeft = this.handleHeroLeft.bind(this);
     this.handleHeroRight = this.handleHeroRight.bind(this);
     this.handleHeroUp= this.handleHeroUp.bind(this);
@@ -43,25 +56,61 @@ class App extends Component {
     this.handleHeroStopX = this.handleHeroStopX.bind(this);
     this.handleHeroStopY = this.handleHeroStopY.bind(this);
     this.handleHeroJump = this.handleHeroJump.bind(this);
+    this.mapToBullet = this.mapToBullet.bind(this);
   }
 
   componentDidMount () {
-    setInterval(() => {
-      this.velY += this.gravity;
-
-      this.stepY = (this.state.hero.top + this.stepY> this.state.playGround.height-this.state.hero.height? 0: this.stepY + this.velY);
-
-      this.setState({
-        hero: {
-          ...this.state.hero,
-          top: this.state.hero.top + this.stepY,
-          left: this.state.hero.left + this.stepX
-        }
-      });
-    }, 20);
+    setInterval(this.intervalFunction, 20);
 
     document.addEventListener("keydown", this.handleKeyDown);
     document.addEventListener("keyup", this.handleKeyUp);
+  }
+
+  intervalFunction () {
+    this.velY += this.gravity;
+    
+    this.stepY = (this.state.hero.top + this.stepY> this.state.playGround.height-this.state.hero.height? 0: this.stepY + this.velY);
+
+    // const bullets = this.state.bullets.map((b) => {
+    //   b.left += this.bulletVelX;
+    //   return b;
+    // });
+    const bullets = [];
+    const preBullets = this.state.bullets;
+    const playGroundWidth = this.state.playGround.width;
+
+    for(let i=0; i<preBullets.length; i++) {
+      const b = preBullets[i];
+
+      b.left += this.bulletVelX;
+
+      if(b.left>((playGroundWidth/2)-20)) {
+        continue;
+      }
+
+      bullets.push(b);
+    }
+
+    if(this.isOnShot) {
+      if(this.shotCount<this.shotInterval) this.shotCount++;
+      else {
+        this.shotCount=0;
+        bullets.push({
+          key: (Math.floor(Math.random() * 10000)),
+          top: this.state.hero.top,
+          left: this.state.hero.left
+        })
+      }
+    }
+
+    this.setState({
+      hero: {
+        ...this.state.hero,
+        top: this.state.hero.top + this.stepY,
+        left: this.state.hero.left + this.stepX,
+      },
+      bullets
+    });
   }
 
   setPlayGroundSize (p) {
@@ -69,8 +118,6 @@ class App extends Component {
       height: p.clientHeight,
       width: p.clientWidth
     };
-
-    console.log(playGround);
 
     return this.setState({
       playGround
@@ -114,6 +161,7 @@ class App extends Component {
     const code = e.keyCode;
 
     switch (code) {
+      case 65: this.isOnShot=true; break;
       case 37: this.handleHeroLeft(); break;
       // case 38: this.handleHeroUp(); break;
       case 39: this.handleHeroRight(); break;
@@ -126,14 +174,21 @@ class App extends Component {
     const code = e.keyCode;
     
     switch (code) {
-      case 32: this.handleHeroJump(); break;// space bar
+      case 65: this.isOnShot=false; break;
+      case 83: this.handleHeroJump(); break;// space bar
       case 37: this.handleHeroStopX(); break;
       // case 38: this.handleHeroStopY(); break;
       case 39: this.handleHeroStopX(); break;
       // case 40: this.handleHeroStopY(); break;
       default: break;
     }
-  } 
+  }
+
+  mapToBullet () {
+    return this.state.bullets.map((b, i) => {
+      return <Bullet key={b.key} top={b.top} left={b.left}/>
+    });
+  }
 
   render() {
     const heroComponent = (
@@ -142,6 +197,7 @@ class App extends Component {
         top={`${this.state.hero.top}px`} 
         left={`${this.state.hero.left - this.state.hero.width}px`}/>
     );
+    const bulletComponent = this.mapToBullet(this.state.bullets);
 
     return (
       <Container className="App">
@@ -153,7 +209,7 @@ class App extends Component {
         <Divider horizontal>SHOOTING GAME</Divider>
         <Grid style={{margin: "auto", height: "90%"}}>
           <Grid.Row style={{margin: "auto", height: "70%"}}>
-            <PlayGround hero={heroComponent} onCreate={p => this.setPlayGroundSize(p)}/>
+            <PlayGround hero={heroComponent} bullets={bulletComponent} onCreate={p => this.setPlayGroundSize(p)}/>
           </Grid.Row>
           <JoyStick 
             onLeft={this.handleHeroLeft} 

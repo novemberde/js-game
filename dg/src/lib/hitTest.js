@@ -1,13 +1,13 @@
 export default (me, target) => {
-  const me_x= parseInt(me.style.left);
-  const me_y= parseInt(me.style.top);
-  const me_width=parseInt(me.style.width);
-  const me_height=parseInt(me.style.height);
+  const me_x= parseInt(me.style.left, 16);
+  const me_y= parseInt(me.style.top, 16);
+  const me_width=parseInt(me.style.width, 16);
+  const me_height=parseInt(me.style.height, 16);
 
-  const target_x= parseInt(target.style.left);
-  const target_y= parseInt(target.style.top);
-  const target_width=parseInt(target.style.width);
-  const target_height=parseInt(target.style.height);
+  const target_x= parseInt(target.style.left, 16);
+  const target_y= parseInt(target.style.top, 16);
+  const target_width=parseInt(target.style.width, 16);
+  const target_height=parseInt(target.style.height, 16);
 
   const result1=(me_x >= target_x) && (me_x <= (target_x+target_width));
   const result2=(me_x+me_width >= target_x) && (me_x+me_width <= (target_x+target_width));
