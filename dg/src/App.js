@@ -92,15 +92,17 @@ class App extends Component {
     }
 
     if(this.isOnShot) {
-      if(this.shotCount<this.shotInterval) this.shotCount++;
-      else {
+      if(this.shotCount===0) {
         this.shotCount=0;
         bullets.push({
           key: (Math.floor(Math.random() * 10000)),
           top: this.state.hero.top,
           left: this.state.hero.left
         })
-      }
+        this.shotCount++
+      } 
+      else if(this.shotCount===this.shotInterval) this.shotCount=0;
+      else this.shotCount++;
     }
 
     this.setState({
@@ -174,7 +176,10 @@ class App extends Component {
     const code = e.keyCode;
     
     switch (code) {
-      case 65: this.isOnShot=false; break;
+      case 65: 
+        this.isOnShot=false; 
+        this.shotCount=0;
+        break;
       case 83: this.handleHeroJump(); break;// space bar
       case 37: this.handleHeroStopX(); break;
       // case 38: this.handleHeroStopY(); break;
@@ -194,7 +199,7 @@ class App extends Component {
     const heroComponent = (
       <Hero title="Warrior" 
         onCreate={this.setHero}
-        top={`${this.state.hero.top}px`} 
+        top={`${this.state.hero.top}px`}
         left={`${this.state.hero.left - this.state.hero.width}px`}/>
     );
     const bulletComponent = this.mapToBullet(this.state.bullets);
