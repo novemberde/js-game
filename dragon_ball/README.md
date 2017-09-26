@@ -1,6 +1,6 @@
 # Dragon ball game
 
-[Demo](https://s3.ap-northeast-2.amazonaws.com/archived-storage/dragon_ball/intro.html)
+[Demo](https://novemberde.github.io/javascript/2017/09/26/dragon_ball_game.html)
 
 Licensing
 
