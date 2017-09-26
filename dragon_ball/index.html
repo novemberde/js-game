@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Dragon Ball</title>
+	<script src="./Hero.js"></script>
+	<script src="./Block.js"></script>
+	<script src="./Bullet.js"></script>
+	<script src="./EnemyBullet.js"></script>
+	<script src="./common.js"></script>
+	<script src="./keyEvent.js"></script>
+	<script src="./Enemy.js"></script>
+	<script src="./KingEnemy.js"></script>
+	<script src="./Score.js"></script>
+	<script src="./GameOver.js"></script>
+	<style>
+		body{
+			margin:0px;
+		}
+		#header{
+			position:relative;
+			margin:auto;
+			width:100%;
+			height:20%;
+			text-align:center;
+			font-size:10pt;
+			font-weight:bold;
+		}
+		#content{
+			position:relative;
+			margin:auto;
+			background-size:cover;
+			overflow:hidden;
+			color:#fa5221;
+		}
+	</style>
+	<script>
+		var content;
+		var header;
+		var onOff=true;		//게임 스위치,꺼지면 모두가 죽고 키이벤트가 먹히지 않으며 시간설정이 다 없어진다.
+		var blockSize=25;	//벽돌 크기
+		var screenH;	//화면 높이
+		var screenW;	//화면 넓이
+		var man;
+		var defense=false;
+		var x=0;
+		var block=new Array();		//2중배열크기. 큰범위
+		var fakeBlock;
+		var blockH=[100,200,300,400,500,550];
+		var blockCount=0;
+		var countJump=0;	//6초에 6번 점프가 가능하도록!
+		var jumpLimit=6;	//점프 제한.
+		var bulletInterval=0;
+		var bulletVelY=0;
+		var bulletSize=20;
+		var speedCount=2.5;
+		var enemy=new Array();	//적 생성.
+		var kingEnemy;	//보스몹 생성.
+		var kingEnemyCount=0;		//보스몹 맞는 횟수 설정
+		var kingEnemyTimeCount=0;	//보스몹이 생기는 시간 설정
+		var kingEnemyType=0;		//보스몹 순서 설정 프리저->셀->마인부우
+		var kingEnemyLevel=10;		//맞아서 죽는 횟수 설정
+		var onKingEnemy=true;		//보스몹 생성 결정
+		var score=0;	//점수 생성.
+		var scoreBox;
+		var srcMon=[	//몬스터의 src주소를 결정한다.
+			"./images/enemy/e1_",
+			"./images/enemy/e2_"
+		];
+		var srcKingMon=[	//몬스터의 src주소를 결정한다.
+			"./images/enemy/k1_",
+			"./images/enemy/k2_",
+			"./images/enemy/k3_"
+		];
+
+		var gameover;		//게임이 끝나는 조건
+
+
+		function init(){
+			content=document.getElementById("content");
+			header=document.getElementById("header");
+			screenH=parseFloat(content.style.height);
+			screenW=parseFloat(content.style.width);
+
+			createBlock();
+			createHero();
+			createEnemy();
+			
+			createBg();
+			keyEvent();
+			createScore();
+		}
+
+		function createHero(){		//주인공 등장
+			man= new Hero(34*2,40*2,300,0);
+			content.appendChild(man.init());			
+		}
+
+		function createBlock(){	//	구름생성 및 적 생성.
+			var blockArray=new Array();	//배열 하나. 작은범위
+
+			for(var i=0;i<4;i++){
+				blockArray[i]=new Block(blockSize*5,blockSize,screenW-blockSize*6*i,screenH-blockH[getRandom(blockH.length)],speedCount);
+				blockArray[i].init();
+			}
+			fakeBlock=new Block(blockSize*5,blockSize,screenW-blockSize*6*getRandom(4),screenH-blockH[getRandom(blockH.length)],speedCount+0.5);	//가짜구름 생성
+			fakeBlock.init();
+
+			block[blockCount]=blockArray;
+			blockCount++;
+
+			countJump=0;		//점프횟수조정가능
+
+			setTimeout("createBlock()",5000);
+		}
+
+		function createBg(){		//백그라운드 설정. 움직이기
+			x-=2;
+			content.style.backgroundImage="url(./images/bg.jpg)";
+			content.style.backgroundSize="400% 100%";
+			content.style.backgroundPosition=x+"px"+" 0px";
+			
+
+			if(x>50000){x=0;}
+			setTimeout("createBg();",10);
+		}
+
+		function createEnemy(){		//몬스터 생성 및 보스몹 생성. 주기적임.
+			for(var i=0;i<4;i++){
+				enemy[i]=new Enemy(80,80,screenW,screenH-blockH[i+1],srcMon[getRandom(srcMon.length)]);
+				content.appendChild(enemy[i].init());
+			}
+
+			if(kingEnemyTimeCount%3==2&&onKingEnemy){
+				createKingEnemy();
+			}
+			kingEnemyTimeCount++;
+
+			setTimeout("createEnemy()",13000);
+		}
+
+		function createKingEnemy(){		//보스몹 생성
+			kingEnemy=new KingEnemy(80,80,screenW-100,screenH-blockH[getRandomByRange(1,4)],srcKingMon[kingEnemyType]);
+			content.appendChild(kingEnemy.init());
+			
+			kingEnemyType++;
+			onKingEnemy=false;
+			if(kingEnemyType>2){kingEnemyType=0;}
+		}
+
+		function createScore(){
+			scoreBox=new Score(200,100,550,0);
+			content.appendChild(scoreBox.init());
+		}
+	</script>
+</head>
+<body onLoad="init()">
+	<!-- <audio autoplay loop>
+	   <source src="./res/fight.mp3" type="audio/mpeg">
+	</audio>  -->
+	<div id="header" style="width:750px;height:50px">게임방법: 가짜구름주의, 점프횟수 제한, Ctrl 에너지파, SpaceBar 점프,Enter 재시작<br>왕을 죽이면 히어로의 HP가 회복된다. 점프횟수 6회 가능. 구름생성 때 점프회복</div>
+	<div id="header" style="width:750px;height:50px">Enjoy-Game: Fake Cloud, Jumping Count, CTRL attack, SpaceBar Jump, Enter Restart, HP recover when KingEnemy is killed. 6 times the number of jumps recovering when the cloud is regenerated.</div>
+	<div id="content" style="width:750px;height:700px"></div>
+</body>
+</html>

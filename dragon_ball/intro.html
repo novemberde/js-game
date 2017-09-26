@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <title>Dragon Ball</title>
+  <style>
+	#content{
+		position:relative;
+		margin:auto;
+		background-image:url(./images/introBg.jpg);
+		background-size:cover;
+		text-align:center;
+		font-size:50pt;
+		font-weight:bold;
+		color:#171577;
+	}
+  </style>
+  <script>
+	var content;
+	var flag=true;
+	function init(){
+		coin=document.getElementById("coin");
+		window.addEventListener("keydown",function(){
+			var key=event.keyCode;
+			if(key==13){
+				location.href="./index.html";
+			}
+		});
+
+		setFlash();
+	}
+
+	function setFlash(){
+		if(flag==true){
+			coin.style.display="block";
+		}else{
+			coin.style.display="none";
+		}
+
+		flag=!flag;
+		setTimeout(setFlash,500);
+	}
+  </script>
+ </head>
+<body onLoad="init()">
+	<!-- <audio autoplay loop>
+	   <source src="./res/openning.mp3" type="audio/mpeg">
+	</audio>  -->
+	<div id="content" style="width:750px;height:700px">
+		<p style="position:absolute;top:150px;left:150px;" id="coin">Dragon Ball<br><br>Press Enter key</p>	
+	</div>
+ </body>
+</html>
