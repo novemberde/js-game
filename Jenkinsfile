@@ -8,7 +8,7 @@ pipeline {
   stages {
     stage('error') {
       steps {
-        sh 'npm test'
+        sh 'echo "Hello"'
       }
     }
   }
