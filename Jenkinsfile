@@ -7,6 +7,12 @@ pipeline {
   }
   stages {
     stage('Initialize') {
+      agent {
+        docker {
+          image 'node'
+        }
+        
+      }
       steps {
         sh 'npm --version'
       }
