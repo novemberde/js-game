@@ -20,6 +20,11 @@ pipeline {
         sh 'echo "Hello"'
       }
     }
+    stage('Deploy') {
+      steps {
+        sh 'exit 125'
+      }
+    }
   }
   environment {
     NODE_ENV = 'development'
