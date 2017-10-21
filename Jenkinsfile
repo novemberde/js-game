@@ -6,7 +6,7 @@ pipeline {
     
   }
   stages {
-    stage('build') {
+    stage('Initialize') {
       agent {
         node {
           label 'Test'
@@ -18,6 +18,28 @@ pipeline {
       }
       steps {
         sh 'npm --version'
+      }
+    }
+    stage('Build') {
+      agent {
+        docker {
+          image 'node'
+        }
+        
+      }
+      steps {
+        sh 'node --version'
+      }
+    }
+    stage('Report') {
+      agent {
+        docker {
+          image 'node'
+        }
+        
+      }
+      steps {
+        echo 'End'
       }
     }
   }
