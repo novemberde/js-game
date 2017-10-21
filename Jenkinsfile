@@ -6,7 +6,7 @@ pipeline {
     
   }
   stages {
-    stage('Test') {
+    stage('build') {
       agent {
         node {
           label 'Test'
@@ -17,12 +17,7 @@ pipeline {
         NODE_ENV = 'development'
       }
       steps {
-        sh 'echo "Hello"'
-      }
-    }
-    stage('Deploy') {
-      steps {
-        sh 'exit 125'
+        sh 'npm --version'
       }
     }
   }
